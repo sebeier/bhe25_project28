@@ -35,7 +35,7 @@ jobs:
       uses: pyTooling/Actions/releaser@main
       with:
         tag: latest
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GH_TOKEN }}
         files: |
           paper/paper.pdf
           info.txt
