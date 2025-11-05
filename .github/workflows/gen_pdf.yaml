@@ -8,6 +8,18 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: biohackathon name given?
+      run: |
+        sed -n '/^---$/,/^---$/{//b;p}' paper/paper.md | grep biohackathon_name
+    - name: biohackathon location given?
+      run: |
+        sed -n '/^---$/,/^---$/{//b;p}' paper/paper.md | grep biohackathon_location
+    - name: biohackathon url given?
+      run: |
+        sed -n '/^---$/,/^---$/{//b;p}' paper/paper.md | grep biohackathon_url
+    - name: Git repository given?
+      run: |
+        sed -n '/^---$/,/^---$/{//b;p}' paper/paper.md | grep git_url
     - uses: kohlerdominik/docker-run-action@v2.0.0
       with:
         image: ghcr.io/biohackrxiv/bhxiv-gen-pdf:master
@@ -25,5 +37,12 @@ jobs:
         tag: latest
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
+          paper/paper.pdf
+          info.txt
+    - name: Upload generated PDF as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PDF and info.txt
+        path: |
           paper/paper.pdf
           info.txt
