@@ -106,7 +106,7 @@ As part of the BioHackathon Europe 2025, we here report about the progress of pr
 
 ## Abstract - Towards a Robust Validation Service for Data and Metadata in ARC RO-Crates
 
-Robust validation of both research data and its accompanying metadata is essential for ensuring adherence to FAIR principles. Current approaches often handle these aspects separately, hindering a holistic quality assessment. Building upon (previous BioHackathon work)[@citesAsAuthority:beier2025biohackgermany24,arend2022biohackeu22,arend2023] establishing (Annotated Research Contexts)[@citesAsAuthority:Weil2023] as (RO-Crates)[@citesAsAuthority:10.3233/ds-210053] - (ARC RO-Crate)[@citesAsAuthority:beier2025biohackeu24] - , we aim to develop and demonstrate an integrated validation strategy for FAIR digital objects. It distinguishes between validating the metadata descriptor and the payload data files.
+Robust validation of both research data and its accompanying metadata is essential for ensuring adherence to FAIR principles. Current approaches often handle these aspects separately, hindering a holistic quality assessment. Building upon (previous BioHackathon work)[@citesAsAuthority:beier2025biohackgermany24] [@citesAsAuthority:arend2022biohackeu22] [@citesAsAuthority:arend2023] establishing (Annotated Research Contexts)[@citesAsAuthority:dataplant_2025_15197625] as (RO-Crates)[@citesAsAuthority:10.3233/ds-210053] - (ARC RO-Crate)[@citesAsAuthority:beier2025biohackeu24] - , we aim to develop and demonstrate an integrated validation strategy for FAIR digital objects. It distinguishes between validating the metadata descriptor and the payload data files.
 
 For the metadata descriptor, validation will ensure structural and semantic compliance to the base RO-Crate specification and the ARC-ISA family of RO-Crate profiles, using and extending the RO-Crate validator tool.
 
@@ -124,6 +124,8 @@ The validation of the RO-Crate metadata structure (i.e., the `ro-crate-metadata.
 
 Work focused on the existing `rocrate-validator` tool with the goal of extending it to support more profiles, specifically the (ISA)[@citesAsAuthority:Rocca_Serra2010] and new MIAPPE profiles being developed (see track 3). This involved planning and initial work on teaching the validator to recognize and apply these new profile definitions, ensuring that crates claiming to conform to a profile (e.g., the ISA structure) actually do.
 
+[Eli to add something about our attempts to use ro-crate-schema-tools]
+
 ## (2) Payload Data Validation (Frictionless)
 
 For validating the contents of payload files (e.g., tabular data in XLSX or CSV files), we adopted the Frictionless Data framework.
@@ -134,7 +136,7 @@ For validating the contents of payload files (e.g., tabular data in XLSX or CSV 
 
 * **DataHUB integration**: 
 
-As the `datamap-validation` tool is containerized, it can be used in CI/CD pipelines on the DataHUB (a collaborative cloud platform to host and share ARCs). The generated junit xml report can be displayed on each job. The following snippet contains a suggestion on how to integrate this in an ARC via the `.gitlab-ci.yml` file without turning off other integrations:
+As the `datamap-validation` tool is containerized, it can be used in CI/CD pipelines on the DataHUB (a collaborative cloud platform to host and share ARCs) [@citesAsAuthority:Weil2023]. The generated junit xml report can be displayed on each job. The following snippet contains a suggestion on how to integrate this in an ARC via the `.gitlab-ci.yml` file without turning off other integrations:
 
 ```yml
 include:
@@ -153,7 +155,8 @@ Datamap Validation:
     stage: datamap-validation
     image: mutagene/datamap-validation:latest
     script:
-        - python /app/datamap-validation.py --arc-path ./ --out-path ./junit_report.xml
+        - python /app/datamap-validation.py --arc-path ./ --out-path \
+          ./junit_report.xml
     artifacts:
         when: always
         paths:
@@ -175,7 +178,9 @@ A significant effort was dedicated to defining and creating machine-actionable R
 
 * **ISA RO-Crate Profile**: We successfully created a "Profile Crate" for the ISA (Investigation-Study-Assay) structure. This is an RO-Crate that defines the ISA RO-Crate Profile itself, making it discoverable and reusable. A helper script was also developed to aid in the creation of such Profile Crates.
 
-* **MIAPPE RO-Crate Profile**: A dedicated subgroup worked on defining a new RO-Crate profile for MIAPPE (Minimum Information About a Plant Phenotyping Experiment). This involved:
+* **RO-Crate Profile Crate Creator**: To aid in this process, we developed the `RO-Crate Profile Crate Creator` (https://github.com/nfdi4plants/ROCratePCC), a new polyglot library (available for Python, .NET, and JavaScript) that programmatically generates the ro-crate-metadata.json for a profile based on a set of inputs.
+
+* **MIAPPE RO-Crate Profile**: A dedicated subgroup worked on defining a new [RO-Crate profile for MIAPPE](https://github.com/MIAPPE/MIAPPE-ROCrate/blob/main/MIAPPE_ro_crate.md) (Minimum Information About a Plant Phenotyping Experiment). This involved:
 
     * Refactoring biological material definitions to align ISA and MIAPPE (e.g., mapping `ISA Source` to `Material Source` and `ISA Sample` to `Biological Material`).
 
@@ -183,7 +188,7 @@ A significant effort was dedicated to defining and creating machine-actionable R
 
     * Concluding that a new "MIAPPE ARC RO-Crate Profile" is required, which will inherit from the ISA, ARC and Datamap profiles (as a direct decendent of the ARC profile).
 
-* **Workflow Run Crate Profile**: The existing Workflow Run Crate profile was updated to support "entry points". This is a key enhancement for CI/CD (Continuous Integration / Continuous Deployment) systems, allowing a DataHUB to automatically discover and execute validation workflows specified within the RO-Crate.
+* **Workflow RO-Crate Profile**: The existing Workflow RO-Crate profile was updated to support RO-Crate version 1.2 (https://doi.org/10.5281/zenodo.13751027), which was released in June 2025. This will enable the Workflow Run Crate profiles and other profiles which build on Workflow RO-Crate to also support RO-Crate 1.2. 
 
 ## (4) ISA RO-Crate Export in FAIRDOM-SEEK
 
