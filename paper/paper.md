@@ -108,7 +108,7 @@ As part of the BioHackathon Europe 2025, we here report about the progress of pr
 
 Robust validation of both research data and its accompanying metadata is essential for ensuring adherence to FAIR principles. Current approaches often handle these aspects separately, hindering a holistic quality assessment. Building upon (previous BioHackathon work)[@citesAsAuthority:beier2025biohackgermany24] [@citesAsAuthority:arend2022biohackeu22] [@citesAsAuthority:arend2023] establishing (Annotated Research Contexts)[@citesAsAuthority:dataplant_2025_15197625] as (RO-Crates)[@citesAsAuthority:10.3233/ds-210053] - (ARC RO-Crate)[@citesAsAuthority:beier2025biohackeu24] - , we aim to develop and demonstrate an integrated validation strategy for FAIR digital objects. It distinguishes between validating the metadata descriptor and the payload data files.
 
-For the metadata descriptor, validation will ensure structural and semantic compliance to the base RO-Crate specification and the ARC-ISA family of RO-Crate profiles, using and extending the RO-Crate validator tool.
+For the metadata descriptor, validation will ensure structural and semantic compliance to the base RO-Crate specification and the ARC family of RO-Crate profiles, including the ISA, Workflow-Run and Datamap profiles, using and extending the RO-Crate validator tool, which builds upon SHACL.
 
 For the payload data files, validation targets the actual content, since data files often require domain-specific structural and value constraints, which requires explicit schema definitions. For this, we will integrate Frictionless for checking data content against community standards (e.g. (MIAPPE)[@citesAsAuthority:Papoutsoglou2020], as demonstrated in the HORIZON project AGENT). Crucially, this project will also explore mechanisms for specifying expected data structures’ requirements within the ARC RO-Crate itself. This aims to provide a more self-contained description of data, investigating how such internal requirements can be linked to data validation frameworks, complementing the crate’s metadata validation.
 
@@ -154,9 +154,10 @@ stages:
 Datamap Validation:
     stage: datamap-validation
     image: mutagene/datamap-validation:latest
-    script:
-        - python /app/datamap-validation.py --arc-path ./ --out-path \
-          ./junit_report.xml
+    script: |
+        - python /app/datamap-validation.py \
+        --arc-path ./ \
+        --out-path ./junit_report.xml
     artifacts:
         when: always
         paths:
@@ -180,13 +181,17 @@ A significant effort was dedicated to defining and creating machine-actionable R
 
 * **RO-Crate Profile Crate Creator**: To aid in this process, we developed the `RO-Crate Profile Crate Creator` (https://github.com/nfdi4plants/ROCratePCC), a new polyglot library (available for Python, .NET, and JavaScript) that programmatically generates the ro-crate-metadata.json for a profile based on a set of inputs.
 
-* **MIAPPE RO-Crate Profile**: A dedicated subgroup worked on defining a new [RO-Crate profile for MIAPPE](https://github.com/MIAPPE/MIAPPE-ROCrate/blob/main/MIAPPE_ro_crate.md) (Minimum Information About a Plant Phenotyping Experiment). This involved:
+* **MIAPPE RO-Crate Profile**: A dedicated subgroup worked on defining a new [RO-Crate profile for MIAPPE](https://github.com/MIAPPE/MIAPPE-ROCrate/blob/cleanup-ro-crate-metadata/MIAPPE_ro_crate.md) (Minimum Information About a Plant Phenotyping Experiment) based on the ISA RO-Crate profile (https://github.com/nfdi4plants/isa-ro-crate-profile). This was motivated by the fact, that not all information required for MIAPPE compliancy can be represented by the existing ISA RO-Crate profile. Further discussion resulted in an alternative potential solution, enabled by a more generic extension of the ARC RO-Crate profiles. This solution includes:
+
+    * Allowing dataset level usage of ontology driven properties through the use of `PropertyValue` to add MIAPPE parameters.
 
     * Refactoring biological material definitions to align ISA and MIAPPE (e.g., mapping `ISA Source` to `Material Source` and `ISA Sample` to `Biological Material`).
 
-    * Defining the use of `PropertyValue` for MIAPPE parameters.
+    * Making small adjustments to ARC Datamap RO-Crate profile (https://github.com/nfdi4plants/arc-datamap-ro-crate-profile) to better suit MIAPPE Observation Units
 
-    * Concluding that a new "MIAPPE ARC RO-Crate Profile" is required, which will inherit from the ISA, ARC and Datamap profiles (as a direct decendent of the ARC profile).
+    * Placing MIAPPE Material definitions in `LabProcess` objects
+
+    * Concluding that a new "MIAPPE ARC RO-Crate Profile" is required in some form or another, which will inherit from the ARC ISA and Datamap profiles (as a direct decendent of the ARC profile). If possible, this profile would not require definition of new properties, but would only contain guidance and constraints on how existing properties are filled out in a MIAPPE-compliant way.
 
 * **Workflow RO-Crate Profile**: The existing Workflow RO-Crate profile was updated to support RO-Crate version 1.2 (https://doi.org/10.5281/zenodo.13751027), which was released in June 2025. This will enable the Workflow Run Crate profiles and other profiles which build on Workflow RO-Crate to also support RO-Crate 1.2. 
 
@@ -223,6 +228,17 @@ The BioHackathon was highly productive. We successfully defined the architecture
 
 The data validation track (Frictionless schema conversion) is largely complete. The MIAPPE and ISA profile definitions are well-advanced. The primary remaining tasks are to finalize the `rocrate-validator` extension to use these new profiles and to develop the "Profile Crate creator" tool further.
 
+## Payload Data Validation
+
+For tabular data validation, the proposed Frictionless-based solution works well and the docker-based integration into the DataHUB validation framework is working as a proof-of-concept.
+
+DataPLANT maintains a dedicated [registry](https://avpr.nfdi4plants.org) for validation packages - self contained scripts that create a well-defined output that not only create validation reports but can also trigger downstream actions (e.g., sending a json payload on badge click) based on the result [@citesAsAuthority:Weil2023].
+
+The logical next step is making Frictionless data validation a first-class citizen in this system, which would mean the extension of the existing .NET script executor to support python as well (to avoid re-writing Frictionless in F# or C#), enabling arbitrary data validation with Frictionless (e.g., data that is not annotated by a Datamap).
+
+A key consideration is that most python dependency managers do not support single-file scripts with inline dependencies, which is the core feature of F# currently used to make validation packages a single self-contained script (see an example [here](https://avpr.nfdi4plants.org/package/invenio)).
+A promising tool for that is [uv](https://docs.astral.sh/uv/guides/scripts/#declaring-script-dependencies), which would enable users to write full validation packages in python.
+
 ## Next Steps
 
 Our immediate next steps are:
@@ -231,11 +247,9 @@ Our immediate next steps are:
 
 2. Complete the extension of the `rocrate-validator` to dynamically load and apply these profiles.
 
-3. Package the Frictionless validation path (DataMap to tableschema) into a deployable microservice.
+3. Integrate these validation services into DataHUB CI/CD pipelines, triggered by the new entry points in the Workflow Run Crate profile.
 
-4. Integrate these validation services into DataHUB CI/CD pipelines, triggered by the new entry points in the Workflow Run Crate profile.
-
-5. Integrate new ISA exporter into FAIRDOM-SEEK’s core, and add ISA profile validation.
+4. Integrate new ISA exporter into FAIRDOM-SEEK’s core, and add ISA profile validation.
 
 This project provides a clear path towards a holistic validation mechanism for ARC RO-Crates, significantly enhancing their FAIRness and reliability.
 
