@@ -110,7 +110,7 @@ authors_short: Chadwick \emph{et al.}
 
 # Introduction
 
-As part of the BioHackathon Europe 2025, we here report about the progress of project 28 during the event.
+As part of the BioHackathon Europe 2025, we here report about the progress of project 28 during the event. The concept and technical foundations for this work were initially funded and developed through the HARVEST project (within the BFSP scientific programme), and the effort was concluded during the BioHackathon.
 
 ## Towards a Robust Validation Service for Data and Metadata in ARC RO-Crates
 
@@ -255,7 +255,7 @@ This project provides a clear path towards a holistic validation mechanism for A
 
 ## Acknowledgements
 
-We thank the organizers of the BioHackathon Europe 2025. This work was funded by ELIXIR, the research infrastructure for life-science data; by the Federal Government of Germany and the county of North Rhine-Westphalia (de.NBI - the German Network for Bioinformatics Infrastructure); by the German Research Foundation (DFG) within the project “Establishment of the National Research Data Infrastructure (NFDI)” in the consortium DataPLANT (https://www.nfdi4plants.de/, project number 442077441) and FAIRagro (www.fairagro.net, project number 501899475); and the European Union through Horizon Europe grant agreement 101058020 (AgroServ) and Horizon 2020 research and innovation programme under grant agreement No. 862613 (AGENT).
+We thank the organizers of the BioHackathon Europe 2025. This work was funded by ELIXIR, the research infrastructure for life-science data, specifically through the HARVEST project under the Biodiversity, Food Security and Pathogens (BFSP) programme; by the Federal Government of Germany and the county of North Rhine-Westphalia (de.NBI - the German Network for Bioinformatics Infrastructure); by the German Research Foundation (DFG) within the project “Establishment of the National Research Data Infrastructure (NFDI)” in the consortium DataPLANT (https://www.nfdi4plants.de/, project number 442077441) and FAIRagro (www.fairagro.net, project number 501899475); and the European Union through Horizon Europe grant agreement 101058020 (AgroServ) and Horizon 2020 research and innovation programme under grant agreement No. 862613 (AGENT).
 
 We acknowledge the extensive discussions with the members of the Language Data Commons of Australia on machine-actionable profiles and validation strategies.
 
